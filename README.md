@@ -98,6 +98,18 @@ The two most important resume files are:
 
 ---
 
+## Quick install (one line)
+
+From inside the project you want to add the kit to, run:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/briankiprop/agentic-ship-kit/main/scripts/bootstrap.sh | bash
+```
+
+This clones the kit into a temporary directory and copies its files into the current project. Existing files are backed up, not overwritten. Run it from **Git Bash** or **WSL** on Windows.
+
+Then open Claude Code in your project and run `/ship Your task here`.
+
 ## Install into an existing project
 
 From this repository folder, run:

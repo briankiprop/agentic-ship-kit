@@ -4,6 +4,10 @@ All notable changes to this project are documented here. This project follows [S
 
 ## Unreleased
 
+### Added
+
+- One-line installer (`scripts/bootstrap.sh`) so the kit can be added to a project with a single `curl | bash` command.
+
 ## v0.1.0 - 2026-06-18
 
 ### Added
