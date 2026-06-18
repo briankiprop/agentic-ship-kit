@@ -21,6 +21,19 @@
 #   bash scripts/register-project.sh /path/to/myapp myapp
 set -uo pipefail
 
+# Resolve a working Python (Windows Git Bash may only have `python`)
+PY=""
+for cand in python3 python; do
+  if command -v "$cand" >/dev/null 2>&1 && "$cand" -c "" >/dev/null 2>&1; then
+    PY="$cand"
+    break
+  fi
+done
+if [ -z "$PY" ]; then
+  echo "Python is required but was not found. Install Python and add it to PATH." >&2
+  exit 1
+fi
+
 CONFIG="$HOME/.agentic-ship-telegram"
 PROJECTS_FILE="$HOME/.agentic-ship-projects"
 OFFSET_FILE="$HOME/.agentic-ship-telegram-offset"
@@ -94,7 +107,7 @@ while true; do
     echo "$OFFSET" > "$OFFSET_FILE"
 
     # Extract message text and chat id
-    TEXT="$(echo "$UPDATE" | python3 -c "
+    TEXT="$(echo "$UPDATE" | $PY -c "
 import sys, json
 try:
     u = json.loads(sys.stdin.read())
@@ -102,7 +115,7 @@ try:
 except: print('')
 " 2>/dev/null || echo "")"
 
-    SENDER_CHAT="$(echo "$UPDATE" | python3 -c "
+    SENDER_CHAT="$(echo "$UPDATE" | $PY -c "
 import sys, json
 try:
     u = json.loads(sys.stdin.read())
@@ -231,7 +244,7 @@ Examples:
         ;;
     esac
 
-  done < <(echo "$UPDATES" | python3 -c "
+  done < <(echo "$UPDATES" | $PY -c "
 import sys, json
 try:
     data = json.loads(sys.stdin.read())
