@@ -7,6 +7,7 @@ All notable changes to this project are documented here. This project follows [S
 ### Added
 
 - One-line installer (`scripts/bootstrap.sh`) so the kit can be added to a project with a single `curl | bash` command.
+- Windows PowerShell installer (`scripts/bootstrap.ps1`) via `irm ... | iex`, with platform-labeled install commands in the README.
 
 ## v0.1.0 - 2026-06-18
 

@@ -100,13 +100,23 @@ The two most important resume files are:
 
 ## Quick install (one line)
 
-From inside the project you want to add the kit to, run:
+Run the command for your shell from inside the project you want to add the kit to.
+
+**macOS / Linux (and Windows Git Bash or WSL):**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/briankiprop/agentic-ship-kit/main/scripts/bootstrap.sh | bash
 ```
 
-This clones the kit into a temporary directory and copies its files into the current project. Existing files are backed up, not overwritten. Run it from **Git Bash** or **WSL** on Windows.
+**Windows PowerShell:**
+
+```powershell
+irm https://raw.githubusercontent.com/briankiprop/agentic-ship-kit/main/scripts/bootstrap.ps1 | iex
+```
+
+Both clone the kit into a temporary directory and copy its files into the current project. Existing files are backed up, not overwritten.
+
+> **Windows note:** the kit's workflow runs `bash` scripts at runtime (the Stop hook runs `bash scripts/checkpoint.sh`, and `/ship` calls `scripts/create-run.sh`), so you need **Git Bash** or **WSL** installed to *run* the workflow. The PowerShell installer only places the files.
 
 Then open Claude Code in your project and run `/ship Your task here`.
 

@@ -87,7 +87,7 @@ REQUIRED_FILES = [
     "templates/merge-checklist.md", "templates/status.md", "templates/handoff.md", "templates/phase-comment.md",
     "scripts/create-run.sh", "scripts/check-branch.sh", "scripts/run-quality-gates.sh",
     "scripts/prevent-main-write.sh", "scripts/update-status.sh", "scripts/current-run.sh", "scripts/install.sh",
-    "scripts/checkpoint.sh", "scripts/bootstrap.sh",
+    "scripts/checkpoint.sh", "scripts/bootstrap.sh", "scripts/bootstrap.ps1",
 ]
 
 AGENTS = {
