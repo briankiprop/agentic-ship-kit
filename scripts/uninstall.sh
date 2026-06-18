@@ -15,14 +15,38 @@ set -euo pipefail
 TARGET="$PWD"
 DELETE=0
 ALL=0
+GLOBAL=0
 
 for arg in "$@"; do
   case "$arg" in
     --delete) DELETE=1 ;;
     --all)    ALL=1 ;;
+    --global) GLOBAL=1 ;;
     *) ;;
   esac
 done
+
+# --global: remove from ~/.claude/ instead of the current project
+if [ "$GLOBAL" -eq 1 ]; then
+  GLOBAL_DIR="${CLAUDE_HOME:-$HOME/.claude}"
+  echo "Uninstalling Agentic Ship Kit from global: $GLOBAL_DIR"
+  for path in "$GLOBAL_DIR/skills/ship-skit" "$GLOBAL_DIR/agents" "$GLOBAL_DIR/rules"; do
+    if [ -e "$path" ]; then
+      if [ "$DELETE" -eq 1 ]; then
+        rm -rf "$path"
+        echo "  Deleted $path"
+      else
+        backup="${path}.agentic-ship-backup.$(date +%Y%m%d%H%M%S)"
+        mv "$path" "$backup"
+        echo "  Moved $path → $backup"
+      fi
+    else
+      echo "  Not found (skipping): $path"
+    fi
+  done
+  echo "Global uninstall complete."
+  exit 0
+fi
 
 BACKUP_DIR="$TARGET/.agentic-ship-removed-$(date +%Y%m%d%H%M%S)"
 

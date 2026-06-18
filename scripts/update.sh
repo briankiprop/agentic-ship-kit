@@ -18,13 +18,30 @@ REPO="${ASK_REPO:-https://github.com/briankiprop/agentic-ship-kit.git}"
 REF="${ASK_REF:-main}"
 TARGET="$PWD"
 FORCE=0
+GLOBAL=0
 
 for arg in "$@"; do
   case "$arg" in
-    --force) FORCE=1 ;;
+    --force)  FORCE=1 ;;
+    --global) GLOBAL=1 ;;
     *) ;;
   esac
 done
+
+# --global: update ~/.claude/ instead of the current project
+if [ "$GLOBAL" -eq 1 ]; then
+  echo "Updating Agentic Ship Kit globally in: ${CLAUDE_HOME:-$HOME/.claude}"
+  echo "Source: $REPO@$REF"
+  TMP="$(mktemp -d)"
+  cleanup() { rm -rf "$TMP"; }
+  trap cleanup EXIT
+  git clone --depth 1 --branch "$REF" "$REPO" "$TMP/kit" >/dev/null 2>&1 || {
+    echo "Failed to clone $REPO@$REF" >&2
+    exit 1
+  }
+  bash "$TMP/kit/scripts/install-global.sh"
+  exit 0
+fi
 
 if ! command -v git >/dev/null 2>&1; then
   echo "git is required but was not found on PATH." >&2
