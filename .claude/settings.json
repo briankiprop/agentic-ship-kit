@@ -44,7 +44,8 @@
       {
         "matcher": "*",
         "hooks": [
-          { "type": "command", "command": "bash scripts/checkpoint.sh", "timeout": 5 }
+          { "type": "command", "command": "bash scripts/checkpoint.sh", "timeout": 5 },
+          { "type": "command", "command": "bash scripts/notify-telegram.sh", "timeout": 10 }
         ]
       }
     ]

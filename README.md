@@ -261,6 +261,84 @@ See [docs/extending.md](docs/extending.md) for how to add custom agents, skills,
 
 ---
 
+## Telegram alerts and remote operation
+
+You can connect the kit to Telegram so it notifies you when it needs your input — and so you can trigger tasks from your phone while away from your PC.
+
+### Step 1 — Create a Telegram bot (5 minutes)
+
+1. Open Telegram and message **@BotFather**
+2. Send `/newbot` and follow the prompts
+3. Copy the bot token it gives you (looks like `123456:ABCdef...`)
+4. Message **@userinfobot** to get your chat ID (a number)
+
+### Step 2 — Run setup
+
+```bash
+bash scripts/setup-telegram.sh
+```
+
+Paste the token and chat ID when asked. It sends a test message to confirm it works. Nothing is committed to git — the token is saved in `~/.agentic-ship-telegram` on your machine only.
+
+### What you get
+
+From now on, every time Claude finishes a step, you get a Telegram message:
+
+| When | Message |
+| --- | --- |
+| Plan is ready | "Plan ready — open Claude Code and say yes to approve" |
+| Waiting for your approval | "⏳ Waiting for your approval" |
+| Tests pass | "✅ Tests passed" |
+| Tests fail | "❌ Tests failed — check test-report.md" |
+| Review complete | "✅ APPROVE" or "⚠️ REQUEST CHANGES" or "🚨 BLOCK" |
+| Ready for PR | "🚀 Ready to PR" |
+
+### Step 3 — Register your projects
+
+So you can trigger tasks from Telegram, register each project once:
+
+```bash
+bash scripts/register-project.sh /path/to/my-app my-app
+bash scripts/register-project.sh /path/to/my-api my-api
+```
+
+### Step 4 — Start the Telegram listener
+
+```bash
+# Run in the background (keeps listening while your PC is on)
+nohup bash scripts/poll-telegram.sh >> ~/.agentic-ship-runs/poll.log 2>&1 &
+```
+
+Now from Telegram, send commands to your bot:
+
+```
+/ship my-app add a login page with email and password
+/ship my-api fix the checkout bug
+/projects                          ← list registered projects
+/status                            ← check if a task is running
+/stop                              ← stop the current task
+```
+
+Claude runs the task entirely in the background. You get Telegram updates as it progresses. When it needs your approval, you get a notification — open Claude Code on your PC (or laptop) to approve, then it continues.
+
+### Auto-resume when context fills up
+
+If Claude's context fills during a long task, `run-headless.sh` automatically retries with `claude --continue` up to 5 times. You don't need to do anything — it picks up from where it left off using `status.md` and `handoff.md`.
+
+### Run a task directly without Telegram
+
+```bash
+bash scripts/run-headless.sh "add a login page" /path/to/my-app
+```
+
+Logs go to `~/.agentic-ship-runs/`.
+
+### Auto-start the listener on boot (Linux)
+
+To keep the Telegram listener running automatically, add a systemd service. See the comment at the bottom of `scripts/poll-telegram.sh` for the exact config.
+
+---
+
 ## Troubleshooting
 
 ### Nothing happens when I type `/ship-skit`
