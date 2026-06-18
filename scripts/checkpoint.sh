@@ -35,7 +35,12 @@ done
 # No Python available -> nothing to stamp, but still succeed.
 [ -n "$PY" ] || exit 0
 
-"$PY" - "$STATUS_FILE" "$HANDOFF_FILE" <<'INNER_PY' || exit 0
+LOG_FILE=".agent-runs/checkpoint.log"
+
+"$PY" - "$STATUS_FILE" "$HANDOFF_FILE" <<'INNER_PY' 2>>"$LOG_FILE" || {
+  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) checkpoint.sh: Python step failed — see $LOG_FILE" >> "$LOG_FILE"
+  exit 0
+}
 from __future__ import annotations
 from datetime import datetime, timezone
 from pathlib import Path

@@ -155,3 +155,44 @@ A change is not ready if:
 - It creates unclear migrations or rollback risks.
 - It skips documentation for behavior that users or operators need to know.
 - It leaves `status.md` or `handoff.md` misleading or stale.
+
+## Phase recovery
+
+When something goes wrong mid-run, recover at the phase level — do not restart the whole pipeline.
+
+| Situation | Recovery action |
+| --- | --- |
+| Reviewer returns `REQUEST CHANGES` | Re-invoke `coder` with reviewer feedback. Do not re-run design or tester unless needed. |
+| Reviewer returns `BLOCK` | Fix the blocking issue, re-invoke `verify`. Do not open a PR until `verify` returns `APPROVE`. |
+| Coder crashed mid-implementation | Read `implementation-log.md`, then say `continue` — resume from where it stopped. |
+| Tests fail after coder ran | Fix code or tests, then re-invoke `tester` only. |
+| Plan became wrong during coding | Stop. Update `plan.md`. Get re-approval. Resume `coder`. |
+| Need to redo a specific phase | Uncheck that phase in `status.md`, set `phase:` to the preceding phase, then say `continue`. |
+
+Never re-run completed phases silently. Always tell the user which phase is being redone and why.
+
+## Triage examples
+
+Use these as calibration when classifying a request.
+
+**Trivial** (no subagents, inline fix):
+- "Fix typo in the README"
+- "Update the copyright year in the header comment"
+- "Reformat this function to match the style guide"
+
+**Small** (`builder` + light `verify`):
+- "The login button is misaligned on mobile" (CSS/UI only, no auth logic)
+- "Add a missing null check in the formatDate helper"
+- "Write a unit test for the parseAmount function"
+
+**Large** (full pipeline):
+- "Add password reset via email" → auth + data model
+- "Switch from bcrypt to argon2" → security primitive
+- "Add a `deleted_at` column for soft deletes" → migration
+- "Refactor the payment service to support multiple currencies" → payments
+- "Move user preferences to a new table" → data model + migration
+
+**Borderline — escalate to large**:
+- "Fix a bug in the session expiry check" → touches session/auth → large
+- "Add logging to the payment webhook handler" → touches payments → large
+- "Update the user model to add a `display_name` field" → data model → large

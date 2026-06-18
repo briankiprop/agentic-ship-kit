@@ -345,6 +345,129 @@ pnpm test
 pnpm test:e2e
 ```
 
+### Adding custom agents, skills, and rules
+
+See [docs/extending.md](docs/extending.md) for a full guide on:
+- Adding a project-specific agent (e.g. a dependency auditor)
+- Adding a custom skill (e.g. `/security-scan`)
+- Adding a project-specific rule (e.g. a rate-limiting rule)
+- Replacing a built-in agent with your own version
+
+### Rollback planning
+
+For changes that touch data models, migrations, or payments, fill out `templates/rollback.md` and include it in `plan.md`. The template prompts for reversibility, exact rollback steps, data impact, estimated time, and verification checks.
+
+---
+
+## Update
+
+To pull the latest kit files into an existing project:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/briankiprop/agentic-ship-kit/main/scripts/bootstrap.sh | bash -s -- --update
+```
+
+This updates `.claude/`, `templates/`, and `scripts/` and backs up existing files. `AGENTS.md` and `CLAUDE.md` are left untouched (they are yours to customise). Add `--force` to also overwrite them.
+
+## Uninstall
+
+```bash
+bash scripts/uninstall.sh
+```
+
+Moves `.claude/`, `templates/`, and `scripts/` to a timestamped backup folder. Pass `--delete` to remove them permanently, or `--all` to also remove `AGENTS.md` and `CLAUDE.md`.
+
+---
+
+## Team collaboration
+
+The kit is designed for a single engineer running it in their Claude Code session. For teams:
+
+- **Commit `.claude/`, `scripts/`, `templates/`, `AGENTS.md`, and `CLAUDE.md`** so every team member gets the same workflow on a fresh clone.
+- **Do not commit `.agent-runs/`** — each engineer's run folders are local artifacts (already in `.gitignore`).
+- **One engineer owns a run** — two people should not drive the same `.agent-runs/<run-id>/` folder at the same time.
+- **Branch per run** — the coder agent creates a feature branch, so concurrent work naturally separates into separate PRs.
+- If your team uses a shared `.claude/settings.json`, keep permission overrides in `.claude/settings.local.json` (gitignored) instead so personal settings don't overwrite shared ones.
+
+---
+
+## CI/CD integration
+
+The kit ships a GitHub Actions workflow (`.github/workflows/ci.yml`) that validates kit structure. To run the kit's quality gates in CI, call `scripts/run-quality-gates.sh` from your own workflow:
+
+```yaml
+- name: Run quality gates
+  run: bash scripts/run-quality-gates.sh
+```
+
+`run-quality-gates.sh` auto-detects Node, Python, and Rails projects and runs the appropriate checks. Customise it for your project's commands.
+
+The kit does **not** auto-trigger `/ship` from CI — that is an interactive, human-approved workflow. CI should run linting, tests, and audits independently.
+
+---
+
+## Troubleshooting
+
+### `checkpoint.sh` fails silently
+
+The Stop hook always exits 0 so it never breaks your turn. If you suspect it is not running, check `.agent-runs/latest-run.txt` exists and points to a valid folder. Run it manually to see any errors:
+
+```bash
+bash scripts/checkpoint.sh
+```
+
+### Python not found on Windows
+
+On Windows Git Bash, `python3` may be the Microsoft Store stub. The scripts try `python3` then `python` automatically. If both fail, install Python from [python.org](https://www.python.org) and add it to your PATH.
+
+### `latest-run.txt` points to a missing folder
+
+Delete or update the file manually:
+
+```bash
+echo ".agent-runs/2026-06-18-my-task" > .agent-runs/latest-run.txt
+```
+
+Or let the next `/ship` create a fresh run.
+
+### Reviewer returns REQUEST CHANGES — what now?
+
+See the [phase recovery](#phase-recovery) section below.
+
+### Agent created files on `main` instead of a branch
+
+The `check-branch.sh` script warns about this. Create a branch and move the commits:
+
+```bash
+git checkout -b agent/my-task
+git branch -f main HEAD~<n>   # move main back n commits
+```
+
+### `.gitignore` block was not added
+
+Run install manually:
+
+```bash
+bash scripts/install.sh "$PWD"
+```
+
+---
+
+## Phase recovery
+
+If an agent fails partway through, or the reviewer asks for changes, use these recovery steps:
+
+| Situation | What to do |
+| --- | --- |
+| Reviewer returns `REQUEST CHANGES` | Re-invoke the `coder` agent with the reviewer's feedback. Do not re-run the full pipeline. |
+| Reviewer returns `BLOCK` | Fix the blocking issue, then re-invoke `verify`. Do not merge until `verify` returns `APPROVE`. |
+| Coder crashed mid-implementation | Check `implementation-log.md` for what was done, then say `continue` to resume from that point. |
+| Tests failed after coder ran | Fix the failing tests or the code, then re-invoke `tester` only (not the full pipeline). |
+| Plan became wrong during implementation | Stop the coder, update `plan.md`, get re-approval, then resume coder. |
+| Need to redo a single phase | State the phase explicitly, e.g. `re-run phase 5 testing` — Claude will run that agent only. |
+
+To revert a completed phase and redo it, update `status.md` to uncheck the relevant phase box and set `phase:` to the phase before it. Then say `continue`.
+
 ---
 
 ## Safety model

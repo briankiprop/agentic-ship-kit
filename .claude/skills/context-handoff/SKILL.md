@@ -53,7 +53,7 @@ Write or update `.agent-runs/<run-id>/handoff.md` with:
 - Exact next step
 - Suggested user prompt for the new session
 
-Keep it compact. Prefer useful facts over long explanations.
+**Size guidance:** aim for 200–400 words. A new session should be able to read the handoff in under 30 seconds and know exactly what to do next. Do not paste full diffs, full file contents, or command output — summarise results instead. If a decision needs context, one sentence on the why is enough. Omit anything the next session can derive by reading `status.md`, `plan.md`, or `git diff`.
 
 ## Step 4: Update status.md
 

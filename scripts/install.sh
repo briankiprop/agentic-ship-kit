@@ -30,6 +30,7 @@ copy_path "AGENTS.md"
 copy_path "CLAUDE.md"
 copy_path "templates"
 copy_path "scripts"
+[ -d "$ROOT/docs" ] && copy_path "docs"
 
 chmod +x "$TARGET"/scripts/*.sh
 

@@ -33,6 +33,20 @@ Classify the request into a tier. Apply rules top to bottom; first match wins.
 
 State the decision and the matched rule, e.g. `Tier: large (rule 1 — touches auth)`. The user may override **upward** (to a stricter tier); never silently downgrade a rule-1 match. **If in doubt, escalate a tier.**
 
+### Triage examples
+
+| Request | Tier | Reason |
+| --- | --- | --- |
+| Fix typo in README | trivial | docs only, zero runtime change |
+| Reformat payment.ts to match style guide | trivial | formatting only — but note: if the file touches payments logic and reformatting changes behavior, escalate |
+| Add null check in formatDate helper | small | one function, no rule-1 keyword |
+| Fix misaligned button on mobile | small | CSS/UI only, bounded blast radius |
+| Fix bug in session expiry check | large | rule 1 — touches session |
+| Add `display_name` column to users | large | rule 1 — data model change |
+| Add logging to payment webhook | large | rule 1 — payments |
+| Switch from bcrypt to argon2 | large | rule 1 — security primitive |
+| Refactor API response formatting | large | cross-cutting, scope ambiguous → escalate |
+
 ## Step 0b: Route
 
 Use the matched row to decide which agents and sections to use.
