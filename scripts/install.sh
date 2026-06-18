@@ -33,6 +33,17 @@ copy_path "scripts"
 
 chmod +x "$TARGET"/scripts/*.sh
 
+# Append kit paths to .gitignore so they don't appear as untracked files
+GITIGNORE="$TARGET/.gitignore"
+MARKER="# agentic-ship-kit"
+
+if [ ! -f "$GITIGNORE" ] || ! grep -qF "$MARKER" "$GITIGNORE"; then
+  printf '\n%s\n.agent-runs/\n\n# common\n.DS_Store\nThumbs.db\n*.log\n*.tmp\n.env\n.env.*\n!.env.example\nnode_modules/\n__pycache__/\n.pytest_cache/\n.coverage\ncoverage/\ndist/\nbuild/\n' "$MARKER" >> "$GITIGNORE"
+  echo "Updated .gitignore to ignore kit files."
+else
+  echo ".gitignore already contains kit entries — skipping."
+fi
+
 cat <<MSG
 Installed Agentic Ship Kit into: $TARGET
 
