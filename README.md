@@ -80,6 +80,8 @@ Or manually delete `~/.claude/skills/ship-skit/`, `~/.claude/agents/`, and `~/.c
 
 ## Option B — Per-project install (teams)
 
+### Install into an existing project
+
 **Do this inside each project you want the kit in.** The kit files are committed to git so the whole team shares the same workflow.
 
 **macOS / Linux / Git Bash / WSL:**
@@ -120,7 +122,7 @@ bash scripts/uninstall.sh
 
 ---
 
-## Step-by-step: your first task
+## How to use the workflow
 
 Here is exactly what happens when you run `/ship-skit add a login page`:
 
@@ -146,7 +148,7 @@ Here is exactly what happens when you run `/ship-skit add a login page`:
 
 ---
 
-## Continuing after a break
+## Resume and context handoff
 
 Claude Code sessions have a context limit. When a session ends (or gets too long), save your progress:
 
@@ -155,6 +157,12 @@ Claude Code sessions have a context limit. When a session ends (or gets too long
 ```
 
 In your next session, pick up where you left off:
+
+```
+/resume-work
+```
+
+or simply:
 
 ```
 continue
