@@ -282,31 +282,6 @@ If Phase 1 is already done and you say `continue with plan`, Claude should say p
 
 ---
 
-## GitHub publishing checklist
-
-Before pushing this kit to GitHub:
-
-```bash
-python3 tests/test_template_structure.py
-./scripts/run-quality-gates.sh
-git status --short
-```
-
-Then:
-
-```bash
-git init
-git add .
-git commit -m "Initial agentic ship kit"
-git branch -M main
-git remote add origin git@github.com:YOUR_USER/agentic-ship-kit.git
-git push -u origin main
-```
-
-After pushing, GitHub Actions should run the included CI workflow.
-
----
-
 ## Repository layout
 
 ```text

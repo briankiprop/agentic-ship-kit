@@ -155,7 +155,6 @@ def assert_readme_is_beginner_friendly() -> None:
         "Install into an existing project",
         "How to use the workflow",
         "Resume and context handoff",
-        "GitHub publishing checklist",
         "/context-handoff",
         "/resume-work",
     ]:
