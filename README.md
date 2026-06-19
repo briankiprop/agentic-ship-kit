@@ -122,6 +122,40 @@ bash scripts/uninstall.sh
 
 ---
 
+## All commands at a glance
+
+Type these in the **Claude Code terminal** (the chat input inside Claude Code):
+
+### Shipping work
+| Command | What it does |
+| --- | --- |
+| `/ship-skit <task>` | Start a task — plan, build, test, review (global install) |
+| `/ship <task>` | Same, but for per-project install |
+| `continue` | Resume a task after a session ends or context fills |
+| `/context-handoff` | Save progress before ending a long session |
+| `/resume-work` | Resume from saved progress in a new session |
+
+### Telegram setup (run these from the Claude terminal, not a shell)
+| Command | What it does |
+| --- | --- |
+| `/ship-kit-setup` | First-time setup — connect Telegram bot, register this project, start the listener |
+| `/ship-kit-reset` | Update credentials, re-register a moved project, or restart the listener |
+| `/ship-kit-remove` | Deregister this project from Telegram (optionally stop the listener) |
+
+### Telegram bot commands (send these inside your Telegram chat)
+| Command | What it does |
+| --- | --- |
+| `/ship <project> <task>` | Start a task remotely, e.g. `/ship my-app add login page` |
+| `/status` | Check if a task is running or a plan is waiting for approval |
+| `/projects` | List all registered projects |
+| `/stop` | Stop the currently running task |
+| `/approve` | Approve the plan Claude sent — coding begins |
+| `/reject` | Cancel the task |
+| `/feedback <notes>` | Approve with changes, e.g. `/feedback make it two columns` |
+| `/help` | Show all available Telegram commands |
+
+---
+
 ## How to use the workflow
 
 Here is exactly what happens when you run `/ship-skit add a login page`:
@@ -433,8 +467,11 @@ agentic-ship-kit/
 │   ├── rules/           ← Security, testing, git, coding standards
 │   ├── settings.json    ← Permission defaults
 │   └── skills/
-│       ├── ship/        ← /ship (per-project)
-│       ├── ship-skit/   ← /ship-skit (global)
+│       ├── ship/            ← /ship (per-project)
+│       ├── ship-skit/       ← /ship-skit (global)
+│       ├── ship-kit-setup/  ← /ship-kit-setup (Telegram setup)
+│       ├── ship-kit-reset/  ← /ship-kit-reset (update config)
+│       ├── ship-kit-remove/ ← /ship-kit-remove (deregister project)
 │       └── ...
 ├── docs/
 │   └── extending.md     ← How to add custom agents, skills, rules
