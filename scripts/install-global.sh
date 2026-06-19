@@ -25,8 +25,11 @@ backup_and_copy() {
   echo "  Installed $2"
 }
 
-# Install the ship-skit global skill
+# Install the ship-skit global skill and setup/reset/remove management skills
 backup_and_copy ".claude/skills/ship-skit" "skills/ship-skit"
+backup_and_copy ".claude/skills/ship-kit-setup" "skills/ship-kit-setup"
+backup_and_copy ".claude/skills/ship-kit-reset" "skills/ship-kit-reset"
+backup_and_copy ".claude/skills/ship-kit-remove" "skills/ship-kit-remove"
 
 # Install all agents
 backup_and_copy ".claude/agents" "agents"

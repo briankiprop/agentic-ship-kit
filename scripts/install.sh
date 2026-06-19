@@ -26,6 +26,12 @@ copy_path() {
 }
 
 copy_path ".claude"
+# Ensure setup/reset/remove skills are present even if .claude was partially copied
+for skill in ship-kit-setup ship-kit-reset ship-kit-remove; do
+  if [ -d "$ROOT/.claude/skills/$skill" ] && [ ! -d "$TARGET/.claude/skills/$skill" ]; then
+    cp -R "$ROOT/.claude/skills/$skill" "$TARGET/.claude/skills/$skill"
+  fi
+done
 copy_path "AGENTS.md"
 copy_path "CLAUDE.md"
 copy_path "templates"
