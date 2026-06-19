@@ -92,14 +92,99 @@ chmod 600 "$CONFIG"
 
 echo ""
 echo "Config saved to: $CONFIG"
+
+# ── Check / install Claude Code CLI ─────────────────────────────────────────
 echo ""
-echo "Telegram notifications are now active."
-echo "You will receive alerts when:"
-echo "  → Claude finishes making a plan (needs your approval)"
-echo "  → Tests pass or fail"
-echo "  → Review is complete (APPROVE / REQUEST CHANGES / BLOCK)"
-echo "  → The session needs to be resumed"
+echo "Checking for Claude Code CLI..."
+
+CLAUDE_STATUS=""
+CLAUDE_VERSION=""
+
+if command -v claude >/dev/null 2>&1; then
+  CLAUDE_VERSION="$(claude --version 2>/dev/null | head -1 || echo "unknown version")"
+  CLAUDE_STATUS="ok"
+  echo "Claude Code CLI found: $CLAUDE_VERSION"
+else
+  echo "Claude Code CLI not found. Installing via npm..."
+  CLAUDE_STATUS="installing"
+  # Send Telegram notice before the install (may take a minute)
+  curl -s -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
+    --data-urlencode "chat_id=${CHAT_ID}" \
+    --data-urlencode "text=Installing Claude Code CLI — this takes about a minute..." \
+    >/dev/null 2>&1 || true
+
+  if command -v npm >/dev/null 2>&1; then
+    if npm install -g @anthropic-ai/claude-code 2>&1; then
+      if command -v claude >/dev/null 2>&1; then
+        CLAUDE_VERSION="$(claude --version 2>/dev/null | head -1 || echo "unknown version")"
+        CLAUDE_STATUS="ok"
+        echo "Claude Code CLI installed: $CLAUDE_VERSION"
+      else
+        CLAUDE_STATUS="install-failed"
+        echo "Install ran but claude still not found. Try: npm install -g @anthropic-ai/claude-code"
+      fi
+    else
+      CLAUDE_STATUS="install-failed"
+      echo "npm install failed. Try manually: npm install -g @anthropic-ai/claude-code"
+    fi
+  else
+    CLAUDE_STATUS="no-npm"
+    echo "npm not found. Install Node.js first: https://nodejs.org"
+    echo "Then run: npm install -g @anthropic-ai/claude-code"
+  fi
+fi
+
+# ── Send full status report to Telegram ─────────────────────────────────────
+PROJECTS_LINE="No projects registered yet. Run: bash scripts/register-project.sh /path/to/project myname"
+if [ -f "$HOME/.agentic-ship-projects" ] && [ -s "$HOME/.agentic-ship-projects" ]; then
+  PROJECTS_LINE="$(cat "$HOME/.agentic-ship-projects")"
+fi
+
+case "$CLAUDE_STATUS" in
+  ok)
+    CLAUDE_LINE="Claude Code CLI: $CLAUDE_VERSION"
+    READY_LINE="Ready! Start the listener: bash scripts/poll-telegram.sh &"
+    ;;
+  installing)
+    CLAUDE_LINE="Claude Code CLI: still installing..."
+    READY_LINE="Re-run setup once install finishes."
+    ;;
+  install-failed)
+    CLAUDE_LINE="Claude Code CLI: install failed — run: npm install -g @anthropic-ai/claude-code"
+    READY_LINE="Fix the install, then start: bash scripts/poll-telegram.sh &"
+    ;;
+  no-npm)
+    CLAUDE_LINE="Claude Code CLI: npm not found — install Node.js from https://nodejs.org"
+    READY_LINE="Install Node.js and npm, then: npm install -g @anthropic-ai/claude-code"
+    ;;
+esac
+
+curl -s -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
+  --data-urlencode "chat_id=${CHAT_ID}" \
+  --data-urlencode "text=Agentic Ship Kit — Setup Complete
+
+${CLAUDE_LINE}
+
+Registered projects:
+${PROJECTS_LINE}
+
+${READY_LINE}
+
+Commands you can send once the listener is running:
+/ship <project> <task>
+/projects
+/status
+/stop
+/help" \
+  >/dev/null 2>&1 || true
+
 echo ""
-echo "To trigger tasks from Telegram, also run:"
-echo "  bash scripts/poll-telegram.sh &"
-echo "  (or add it to your startup: see scripts/poll-telegram.sh for instructions)"
+echo "Status report sent to Telegram."
+echo ""
+if [ "$CLAUDE_STATUS" = "ok" ]; then
+  echo "Everything is ready. Start the listener:"
+  echo "  bash scripts/poll-telegram.sh &"
+else
+  echo "Fix the Claude Code CLI install (see above), then start the listener:"
+  echo "  bash scripts/poll-telegram.sh &"
+fi

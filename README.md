@@ -269,9 +269,24 @@ See [docs/extending.md](docs/extending.md) for how to add custom agents, skills,
 
 ---
 
-## Telegram alerts and remote operation
+## Remote control options
 
-You can connect the kit to Telegram so it notifies you when it needs your input — and so you can trigger tasks from your phone while away from your PC.
+You have three ways to control the kit remotely. Use whichever fits your setup.
+
+### Option 1 — Claude app (simplest, no setup)
+
+The **Claude web app** ([claude.ai](https://claude.ai)) and the **Claude mobile app** (iOS / Android) both support skills and agents. If you have the kit installed globally (Option A above), you can open claude.ai or the mobile app, switch to a project or start a conversation, and use `/ship-skit` exactly as you would in the CLI.
+
+- No extra setup needed
+- Works on any device with a browser or the app
+- Plan approval, feedback, and task control all happen in the chat
+- Skills, rules, and agents in `~/.claude/` are available to Claude Code sessions connected to your machine
+
+This is the recommended first option if you just want to kick off tasks or approve plans while away from your desk.
+
+### Option 2 — Telegram bot (best for background tasks)
+
+Connect the kit to Telegram so it notifies you as tasks progress and lets you approve plans, stop tasks, or start new ones — all from your phone. Best when you want the task running fully in the background on your PC while you're away.
 
 ### Step 1 — Create a Telegram bot (5 minutes)
 
@@ -290,16 +305,19 @@ Paste the token and chat ID when asked. It sends a test message to confirm it wo
 
 ### What you get
 
-From now on, every time Claude finishes a step, you get a Telegram message:
+As Claude works through the task you get Telegram messages at each phase:
 
 | When | Message |
 | --- | --- |
-| Plan is ready | "Plan ready — open Claude Code and say yes to approve" |
-| Waiting for your approval | "⏳ Waiting for your approval" |
-| Tests pass | "✅ Tests passed" |
-| Tests fail | "❌ Tests failed — check test-report.md" |
-| Review complete | "✅ APPROVE" or "⚠️ REQUEST CHANGES" or "🚨 BLOCK" |
-| Ready for PR | "🚀 Ready to PR" |
+| Task starts | "Starting task on my-app" |
+| Planning | "Planning..." |
+| Writing code | "Writing code..." |
+| Running tests | "Running tests..." |
+| Plan ready for review | Full plan text sent — reply `/approve`, `/reject`, or `/feedback <notes>` |
+| Review complete | "Review: APPROVE" or "Review: REQUEST CHANGES" or "Review: BLOCK" |
+| Task complete | Summary of what was done |
+| Needs clarification | Claude's question forwarded — reply `/ship my-app <clarified task>` |
+| Stopped or interrupted | "Task was stopped or interrupted" |
 
 ### Step 3 — Register your projects
 
@@ -323,11 +341,15 @@ Now from Telegram, send commands to your bot:
 /ship my-app add a login page with email and password
 /ship my-api fix the checkout bug
 /projects                          ← list registered projects
-/status                            ← check if a task is running
+/status                            ← check if a task is running (or if a plan needs approval)
 /stop                              ← stop the current task
+
+/approve                           ← approve the plan, start coding
+/reject                            ← cancel the task
+/feedback make it two columns      ← approve with changes, then code
 ```
 
-Claude runs the task entirely in the background. You get Telegram updates as it progresses. When it needs your approval, you get a notification — open Claude Code on your PC (or laptop) to approve, then it continues.
+Claude runs the task entirely in the background. You get Telegram updates as it progresses. When the plan is ready, the bot sends you the full plan and waits — reply `/approve`, `/reject`, or `/feedback <notes>` directly in Telegram. No need to open Claude Code on your PC.
 
 ### Auto-resume when context fills up
 
