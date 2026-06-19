@@ -295,13 +295,24 @@ Connect the kit to Telegram so it notifies you as tasks progress and lets you ap
 3. Copy the bot token it gives you (looks like `123456:ABCdef...`)
 4. Message **@userinfobot** to get your chat ID (a number)
 
-### Step 2 — Run setup
+### Step 2 — Run setup from the Claude terminal
 
-```bash
-bash scripts/setup-telegram.sh
+Open any project in Claude Code and type:
+
+```
+/ship-kit-setup
 ```
 
-Paste the token and chat ID when asked. It sends a test message to confirm it works. Nothing is committed to git — the token is saved in `~/.agentic-ship-telegram` on your machine only.
+Claude will guide you through the whole setup interactively — no bash commands needed:
+
+1. Asks you to paste the bot token and chat ID
+2. Tests the connection and sends a confirmation to Telegram
+3. Registers the current project automatically
+4. Starts the background listener
+
+Nothing is committed to git — credentials are saved in `~/.agentic-ship-telegram` on your machine only.
+
+> **Alternative (manual):** If you prefer the command line, run `bash scripts/setup-telegram.sh` and then `bash scripts/register-project.sh /path/to/project alias`.
 
 ### What you get
 
@@ -319,23 +330,21 @@ As Claude works through the task you get Telegram messages at each phase:
 | Needs clarification | Claude's question forwarded — reply `/ship my-app <clarified task>` |
 | Stopped or interrupted | "Task was stopped or interrupted" |
 
-### Step 3 — Register your projects
+### Step 3 — Register more projects
 
-So you can trigger tasks from Telegram, register each project once:
+For each additional project, open it in Claude Code and run:
 
-```bash
-bash scripts/register-project.sh /path/to/my-app my-app
-bash scripts/register-project.sh /path/to/my-api my-api
+```
+/ship-kit-setup
 ```
 
-### Step 4 — Start the Telegram listener
+It detects that credentials are already saved and skips straight to registering the new project.
 
-```bash
-# Run in the background (keeps listening while your PC is on)
-nohup bash scripts/poll-telegram.sh >> ~/.agentic-ship-runs/poll.log 2>&1 &
-```
+> **Alternative:** `bash scripts/register-project.sh /path/to/my-api my-api`
 
-Now from Telegram, send commands to your bot:
+### Telegram commands
+
+Once the listener is running, send these from your bot:
 
 ```
 /ship my-app add a login page with email and password
@@ -349,7 +358,16 @@ Now from Telegram, send commands to your bot:
 /feedback make it two columns      ← approve with changes, then code
 ```
 
-Claude runs the task entirely in the background. You get Telegram updates as it progresses. When the plan is ready, the bot sends you the full plan and waits — reply `/approve`, `/reject`, or `/feedback <notes>` directly in Telegram. No need to open Claude Code on your PC.
+Claude runs the task entirely in the background. When the plan is ready, the bot sends you the full plan and waits — reply directly in Telegram. No need to open Claude Code on your PC.
+
+### Managing your setup
+
+| Need | Command |
+| --- | --- |
+| Update bot token or chat ID | `/ship-kit-reset` in Claude terminal |
+| Re-register a project (moved or renamed) | `/ship-kit-reset` in Claude terminal |
+| Restart the listener | `/ship-kit-reset` in Claude terminal |
+| Remove a project from Telegram | `/ship-kit-remove` in Claude terminal |
 
 ### Auto-resume when context fills up
 
@@ -362,10 +380,6 @@ bash scripts/run-headless.sh "add a login page" /path/to/my-app
 ```
 
 Logs go to `~/.agentic-ship-runs/`.
-
-### Auto-start the listener on boot (Linux)
-
-To keep the Telegram listener running automatically, add a systemd service. See the comment at the bottom of `scripts/poll-telegram.sh` for the exact config.
 
 ---
 
