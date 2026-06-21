@@ -143,9 +143,19 @@ Show the user the goal, plan summary, test summary, risks, files likely to chang
 
 After approval, invoke the `coder` subagent. It creates or uses a feature branch, implements the approved plan, adds or updates tests, updates `implementation-log.md`, and keeps `status.md` and `handoff.md` accurate enough to resume.
 
+### Step 5b: Drift check (before verify)
+
+Before invoking verify, run the anti-drift check:
+
+```bash
+bash scripts/check-drift.sh "$PROJECT_DIR"
+```
+
+If the script is unavailable, skip silently. If `drift-report.md` is written to the run folder, the verify subagent reads it first (see verify rules). A `FAIL` result means unresolved acceptance criteria — verify will return `REQUEST CHANGES` immediately. A `WARN` result means unexpected scope; verify continues but scrutinises flagged files.
+
 ### Step 6: Verify (test + review)
 
-Invoke the `verify` subagent. It runs the required commands and produces `test-report.md` (PASS only if checks actually passed), reviews the diff against the plan and test plan, produces `review-report.md`, decides APPROVE / REQUEST CHANGES / BLOCK, and updates `status.md`.
+Invoke the `verify` subagent. It reads `drift-report.md` first, then runs the required commands and produces `test-report.md` (PASS only if checks actually passed), reviews the diff against the plan and test plan, produces `review-report.md`, decides APPROVE / REQUEST CHANGES / BLOCK, and updates `status.md`.
 
 ### Step 7: Release check
 

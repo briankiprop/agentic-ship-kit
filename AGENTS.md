@@ -120,6 +120,27 @@ Last 3–5 commands with outcomes.
 
 Omit anything the next session can derive from `status.md` or `git diff`. Never paste full diffs or file contents.
 
+## Plan anti-drift
+
+`scripts/check-drift.sh` runs automatically after the coder phase and before verify. It compares the approved `plan.md` against implementation state using pure shell — zero LLM cost.
+
+**What it checks:**
+- `plan.md ## Acceptance criteria` — any `- [ ]` item still unchecked → **FAIL**
+- `plan.md ## Files likely to change` — planned files not touched → **WARN**
+- `git diff` — files changed but not in the plan → **WARN**
+- `implementation-log.md ## Deviations from approved plan` — self-reported deviations → **WARN**
+
+**Output:** `drift-report.md` in the run folder with verdict `CLEAN`, `WARN`, or `FAIL`.
+
+**Coder obligation:** Before finishing, tick each completed acceptance criterion in `implementation-log.md`, and record any deviations in `## Deviations from approved plan`. Do not self-approve scope changes — stop and update `plan.md` first.
+
+**Verify obligation:** Read `drift-report.md` before running any tests. A `FAIL` verdict means unchecked acceptance criteria — issue `REQUEST CHANGES` immediately.
+
+**Acceptance criteria format** (required for `check-drift.sh` to parse `plan.md`):
+```markdown
+- [ ] Each criterion is one line, starts with "- [ ]"
+```
+
 ## Codebase context cache
 
 `scripts/build-context.sh` generates `.ship-context/` — four markdown files (~800–1500 tokens total) summarising the repo for agents:

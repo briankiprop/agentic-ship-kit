@@ -263,14 +263,20 @@ Task: $TASK"
   fi
 
   # Build continuation prompt based on approval or feedback
+  DRIFT_NOTE="After the coder subagent finishes and before invoking verify, run: bash scripts/check-drift.sh
+This writes drift-report.md to the run folder. The verify subagent reads it automatically."
   if echo "$APPROVAL_RESPONSE" | grep -q '^feedback:'; then
     FEEDBACK_NOTES="${APPROVAL_RESPONSE#feedback:}"
     CONTINUE_MSG="The user has reviewed the plan and approved it with these notes: ${FEEDBACK_NOTES}
 
-Please update the plan accordingly and then continue with implementation. Task: $TASK"
+Please update the plan accordingly and then continue with implementation.
+${DRIFT_NOTE}
+Task: $TASK"
     send_telegram "[${PROJECT_NAME}] Plan approved with feedback — continuing..."
   else
-    CONTINUE_MSG="The user has approved the plan. Please continue with implementation. Task: $TASK"
+    CONTINUE_MSG="The user has approved the plan. Please continue with implementation.
+${DRIFT_NOTE}
+Task: $TASK"
     send_telegram "[${PROJECT_NAME}] Plan approved — coding now..."
   fi
 

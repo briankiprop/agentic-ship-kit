@@ -35,6 +35,13 @@ Rules:
 - If context gets close to red, stop and use `/context-handoff` before continuing.
 - Do not merge to main or master.
 
+Before marking implementation complete (anti-drift self-check):
+
+- Re-read `plan.md ## Acceptance criteria`. For each `- [ ]` item, tick it `- [x]` in `implementation-log.md` if the criterion is now satisfied.
+- Re-read `plan.md ## Files likely to change`. If you touched a file not on that list, or skipped a file that was listed, record it explicitly in `implementation-log.md ## Deviations from approved plan`.
+- If you changed scope — added behavior, removed planned behavior, or touched files beyond the plan — stop and update `plan.md` before continuing. Do not self-approve scope changes.
+- `scripts/check-drift.sh` will run automatically after you finish and will flag unresolved items for verify.
+
 Before finishing:
 
 - Run formatting if available.

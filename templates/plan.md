@@ -90,6 +90,8 @@ updated_by: planner
 
 ## Acceptance criteria
 
+<!-- check-drift.sh reads this section. Use checkbox format: "- [ ] description" (one criterion per line).
+     The coder must tick each item before finishing. check-drift.sh will flag any that remain unchecked. -->
 - [ ] 
 
 ## Questions or assumptions

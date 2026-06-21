@@ -19,6 +19,13 @@ Your job is to run the tests and quality gates, then review the final diff again
 
 If the `ship-context` MCP tools are available, call `get_index()`, `get_structure()`, and `get_symbols()` instead of reading `.ship-context/` files directly — tool responses are prompt-cached and cost ~10× less on repeated calls. If MCP tools are unavailable, fall back to reading `.ship-context/INDEX.md`, `structure.md`, and `symbols.md` directly. Either way, use these as your navigation layer — only Read individual source files when the task specifically requires their full content. Do not run broad Grep or Glob sweeps over files already summarised in the context cache.
 
+Anti-drift check (run first, before tests):
+
+- Look for `drift-report.md` in the run folder. If it exists, read it before doing anything else.
+  - **FAIL**: Acceptance criteria in plan.md are unchecked. Treat this as a test failure. Write `test-report.md` with `Overall status: FAIL` and `Decision: REQUEST CHANGES` citing the unchecked criteria. Do not run other checks until the coder resolves them.
+  - **WARN**: Unexpected scope or self-reported deviations. Continue with tests, but scrutinize flagged files first in the review.
+  - **CLEAN** or absent: Proceed normally.
+
 Rules:
 
 - Do not edit source files. Do not fix code yourself — report problems for the coder.
