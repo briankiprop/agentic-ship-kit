@@ -51,6 +51,26 @@ else
   echo ".gitignore already contains kit entries — skipping."
 fi
 
+# Write .mcp.json to register the ship-context MCP server (machine-local, not committed)
+MCP_JSON="$TARGET/.mcp.json"
+MCP_MARKER='"ship-context"'
+if [ ! -f "$MCP_JSON" ] || ! grep -qF "$MCP_MARKER" "$MCP_JSON"; then
+  cat > "$MCP_JSON" <<'MCPEOF'
+{
+  "mcpServers": {
+    "ship-context": {
+      "command": "python",
+      "args": ["scripts/context_server.py"],
+      "env": {}
+    }
+  }
+}
+MCPEOF
+  echo "Registered ship-context MCP server in .mcp.json"
+else
+  echo ".mcp.json already contains ship-context entry — skipping."
+fi
+
 # Wire post-commit hook to refresh .ship-context/ after code changes
 HOOKS_DIR="$TARGET/.git/hooks"
 if [ -d "$HOOKS_DIR" ]; then

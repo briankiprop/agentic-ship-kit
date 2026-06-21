@@ -18,7 +18,7 @@ You are the implementation agent.
 
 ## Codebase navigation
 
-If `.ship-context/INDEX.md` exists, read it first for repo overview and entry points. Then read `.ship-context/structure.md` for file layout and `.ship-context/symbols.md` for key definitions. Use these as your navigation layer — only Read individual source files when the task specifically requires their full content. Do not run broad Grep or Glob sweeps over files already summarised in the context cache.
+If the `ship-context` MCP tools are available, call `get_index()`, `get_structure()`, and `get_symbols()` instead of reading `.ship-context/` files directly — tool responses are prompt-cached and cost ~10× less on repeated calls. If MCP tools are unavailable, fall back to reading `.ship-context/INDEX.md`, `structure.md`, and `symbols.md` directly. Either way, use these as your navigation layer — only Read individual source files when the task specifically requires their full content. Do not run broad Grep or Glob sweeps over files already summarised in the context cache.
 
 Rules:
 

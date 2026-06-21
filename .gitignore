@@ -5,6 +5,9 @@
 .ship-context-cache/
 .ship_context_*.json
 
+# MCP server config (machine-local, not committed)
+.mcp.json
+
 .DS_Store
 .env
 .env.*
