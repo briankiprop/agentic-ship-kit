@@ -92,6 +92,17 @@ if handoff_path.is_file():
     if next_action:
         h = re.sub(r"^next_action:.*$", f"next_action: {next_action}", h, count=1, flags=re.MULTILINE)
     handoff_path.write_text(h, encoding="utf-8")
+
+    # Warn if handoff.md is growing too large (proxy for token bloat)
+    line_count = len(h.splitlines())
+    if line_count > 150:
+        import sys as _sys
+        print(
+            f"[checkpoint] WARNING: handoff.md is {line_count} lines — "
+            "aim for under 150 lines (~400 words). Trim to: summary, changed files, "
+            "key decisions, next action, commands run.",
+            file=_sys.stderr,
+        )
 INNER_PY
 
 exit 0

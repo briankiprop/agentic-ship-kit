@@ -51,6 +51,12 @@ Not reviewed yet.
 
 Complete intent.md, then invoke the planner.
 
+## Unknowns and gaps
+
+Things the agent is uncertain about, couldn't verify, or didn't have time to check. The next session should investigate these first.
+
+- [ ] TODO: list blind spots here
+
 ## How to resume in a new session
 
 In a new Claude Code session, say:

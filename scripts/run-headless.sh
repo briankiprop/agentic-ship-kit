@@ -197,6 +197,19 @@ fi
 PROMPT_CONTENT="$(cat "$PROMPT_FILE")"
 rm -f "$PROMPT_FILE"
 
+# ── Pre-flight: build/refresh codebase context cache (no LLM, pure shell) ───
+if [ -f "$PROJECT_DIR/scripts/build-context.sh" ]; then
+  echo "[ship-kit] Building codebase context..." | tee -a "$LOGFILE"
+  bash "$PROJECT_DIR/scripts/build-context.sh" "$PROJECT_DIR" 2>&1 | tee -a "$LOGFILE" || true
+  # Token estimate — warn if context is getting large
+  CONTEXT_WORDS="$(wc -w "$PROJECT_DIR/.ship-context"/*.md 2>/dev/null | tail -1 | awk '{print $1}' || echo 0)"
+  CONTEXT_TOKENS=$(( CONTEXT_WORDS * 100 / 75 ))
+  echo "[ship-kit] Context cache: ~${CONTEXT_TOKENS} tokens" | tee -a "$LOGFILE"
+  if [ "$CONTEXT_TOKENS" -gt 3000 ]; then
+    echo "[ship-kit] WARNING: context cache is large (${CONTEXT_TOKENS} tokens) — agents may see higher token usage." | tee -a "$LOGFILE"
+  fi
+fi
+
 # ── Phase 1: Planning only (up to --max-turns 20) ───────────────────────────
 # Claude produces the plan, writes plan.md, then stops. We then gate on approval.
 EXIT=0
@@ -277,7 +290,20 @@ Task: $TASK"
     sleep 10
     EXIT=0
     cd "$PROJECT_DIR"
-    claude --continue -p "Continue the task: $TASK" --max-turns 80 --dangerously-skip-permissions --output-format text >> "$LOGFILE" 2>&1 || EXIT=$?
+    # Build a compact retry context from status.md so the agent doesn't re-read the whole repo
+    RETRY_STATUS=""
+    LATEST_RUN_FILE="$PROJECT_DIR/.agent-runs/latest-run.txt"
+    if [ -f "$LATEST_RUN_FILE" ]; then
+      LATEST_RUN_REL="$(cat "$LATEST_RUN_FILE" 2>/dev/null | tr -d '\r' | head -n1 || true)"
+      [ -n "$LATEST_RUN_REL" ] && RETRY_STATUS="$(head -20 "$PROJECT_DIR/$LATEST_RUN_REL/status.md" 2>/dev/null || true)"
+    fi
+    RETRY_MSG="Continue from where you left off.${RETRY_STATUS:+
+
+Current status:
+$RETRY_STATUS}
+
+Task: $TASK"
+    claude --continue -p "$RETRY_MSG" --max-turns 80 --dangerously-skip-permissions --output-format text >> "$LOGFILE" 2>&1 || EXIT=$?
   done
 
 else
@@ -309,7 +335,19 @@ Task: $TASK"
     sleep 10
     EXIT=0
     cd "$PROJECT_DIR"
-    claude --continue -p "Continue the task: $TASK" --max-turns 80 --dangerously-skip-permissions --output-format text >> "$LOGFILE" 2>&1 || EXIT=$?
+    RETRY_STATUS=""
+    LATEST_RUN_FILE="$PROJECT_DIR/.agent-runs/latest-run.txt"
+    if [ -f "$LATEST_RUN_FILE" ]; then
+      LATEST_RUN_REL="$(cat "$LATEST_RUN_FILE" 2>/dev/null | tr -d '\r' | head -n1 || true)"
+      [ -n "$LATEST_RUN_REL" ] && RETRY_STATUS="$(head -20 "$PROJECT_DIR/$LATEST_RUN_REL/status.md" 2>/dev/null || true)"
+    fi
+    RETRY_MSG="Continue from where you left off.${RETRY_STATUS:+
+
+Current status:
+$RETRY_STATUS}
+
+Task: $TASK"
+    claude --continue -p "$RETRY_MSG" --max-turns 80 --dangerously-skip-permissions --output-format text >> "$LOGFILE" 2>&1 || EXIT=$?
   done
 fi
 

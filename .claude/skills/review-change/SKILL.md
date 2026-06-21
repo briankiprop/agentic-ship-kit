@@ -20,3 +20,11 @@ Use this when the user wants a final engineering review.
 
 Do not edit source files.
 Do not merge.
+
+## Agent execution rules
+
+- Read `status.md`, `handoff.md`, and `git diff` first — do not re-read the full codebase.
+- If `.ship-context/INDEX.md` exists, use it for structural context instead of Glob sweeps.
+- Review the diff, not the whole repo — flag only what changed.
+- Never re-read files already covered in the run's existing `review-report.md` or `handoff.md`.
+- Tag each finding with VERIFIED, INFERRED, or AMBIGUOUS before writing the report.

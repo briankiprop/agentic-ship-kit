@@ -94,6 +94,45 @@ or:
 continue
 ```
 
+### handoff.md structure
+
+Keep `handoff.md` under 150 lines (~400 words). Required sections:
+
+```markdown
+## Summary
+One paragraph. Task, current phase, what's done.
+
+## Changed files
+- path/to/file.ext — what changed and why (one line each)
+
+## Key decisions
+- Decision and why
+
+## Next action
+Exact next step for the resuming session.
+
+## Commands run
+Last 3–5 commands with outcomes.
+
+## Unknowns and gaps
+- [ ] Things not verified, not tested, or uncertain — explicit blind spots.
+```
+
+Omit anything the next session can derive from `status.md` or `git diff`. Never paste full diffs or file contents.
+
+## Codebase context cache
+
+`scripts/build-context.sh` generates `.ship-context/` — four markdown files (~800–1500 tokens total) summarising the repo for agents:
+
+- `INDEX.md` — repo overview, languages, entry points
+- `structure.md` — file tree with per-file descriptions
+- `symbols.md` — functions, classes, exports (grep-based, no LLM)
+- `recent-changes.md` — last 20 commits and diff stats
+
+**Agents must read `.ship-context/INDEX.md` first** before any Grep or Glob sweep. Only open individual source files when the task specifically requires their full content.
+
+The cache is rebuilt automatically by the `post-commit` hook when code files change. Force a rebuild: `bash scripts/build-context.sh --force`.
+
 ## Branch naming
 
 Use one of:

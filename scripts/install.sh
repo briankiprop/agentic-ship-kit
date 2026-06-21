@@ -45,10 +45,26 @@ GITIGNORE="$TARGET/.gitignore"
 MARKER="# agentic-ship-kit"
 
 if [ ! -f "$GITIGNORE" ] || ! grep -qF "$MARKER" "$GITIGNORE"; then
-  printf '\n%s\n.agent-runs/\n\n# common\n.DS_Store\nThumbs.db\n*.log\n*.tmp\n.env\n.env.*\n!.env.example\nnode_modules/\n__pycache__/\n.pytest_cache/\n.coverage\ncoverage/\ndist/\nbuild/\n' "$MARKER" >> "$GITIGNORE"
+  printf '\n%s\n.agent-runs/\n\n# ship-kit context cache (generated, not committed)\n.ship-context/\n.ship-context-cache/\n.ship_context_*.json\n\n# common\n.DS_Store\nThumbs.db\n*.log\n*.tmp\n.env\n.env.*\n!.env.example\nnode_modules/\n__pycache__/\n.pytest_cache/\n.coverage\ncoverage/\ndist/\nbuild/\n' "$MARKER" >> "$GITIGNORE"
   echo "Updated .gitignore to ignore kit files."
 else
   echo ".gitignore already contains kit entries — skipping."
+fi
+
+# Wire post-commit hook to refresh .ship-context/ after code changes
+HOOKS_DIR="$TARGET/.git/hooks"
+if [ -d "$HOOKS_DIR" ]; then
+  POST_COMMIT="$HOOKS_DIR/post-commit"
+  HOOK_MARKER="# ship-kit-hook"
+  if [ ! -f "$POST_COMMIT" ] || ! grep -qF "$HOOK_MARKER" "$POST_COMMIT"; then
+    printf '\n%s\nbash "$(git rev-parse --show-toplevel)/scripts/post-commit.sh"\n' "$HOOK_MARKER" >> "$POST_COMMIT"
+    chmod +x "$POST_COMMIT"
+    echo "Wired post-commit hook for .ship-context/ auto-refresh."
+  else
+    echo "post-commit hook already contains ship-kit entry — skipping."
+  fi
+else
+  echo "No .git/hooks directory found — skipping post-commit hook wiring."
 fi
 
 cat <<MSG

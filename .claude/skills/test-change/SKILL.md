@@ -19,3 +19,10 @@ Use this when implementation is already complete and the user wants verification
 8. Mark PASS only when required checks actually passed.
 
 Do not edit source files.
+
+## Agent execution rules
+
+- If `.ship-context/INDEX.md` exists, read it before exploring the codebase.
+- Read only files relevant to the stated change — not the whole project.
+- Dispatch independent read operations in parallel (multiple Read calls in one message).
+- Never re-read files already covered in the run's existing `test-plan.md` or `handoff.md`.

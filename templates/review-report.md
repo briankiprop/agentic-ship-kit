@@ -19,15 +19,30 @@ updated_by: reviewer
 
 APPROVE / REQUEST CHANGES / BLOCK
 
+## Confidence
+
+Tag each section below with one of:
+- **VERIFIED** — confirmed by running tests or commands
+- **INFERRED** — reasoned from code reading, not directly tested
+- **AMBIGUOUS** — uncertain; flag for human review before merge
+
 ## Summary
 
 ## Spec compliance
 
+[VERIFIED / INFERRED / AMBIGUOUS]
+
 ## Test coverage
+
+[VERIFIED / INFERRED / AMBIGUOUS]
 
 ## Security review
 
+[VERIFIED / INFERRED / AMBIGUOUS]
+
 ## Maintainability review
+
+[INFERRED]
 
 ## Risks
 

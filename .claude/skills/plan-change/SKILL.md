@@ -21,3 +21,10 @@ If the user says "continue" or "continue with plan", use `/resume-work` first an
 8. End with assumptions, risks, acceptance criteria, and next phase.
 
 Do not edit source files.
+
+## Agent execution rules
+
+- If `.ship-context/INDEX.md` exists, read it before exploring the codebase.
+- Read only files relevant to the stated change — not the whole project.
+- Dispatch independent read operations in parallel (multiple Read calls in one message).
+- Never re-read files already covered in the run's existing `plan.md` or `handoff.md`.

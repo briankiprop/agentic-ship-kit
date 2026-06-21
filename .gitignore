@@ -1,4 +1,10 @@
 .agent-runs/
+
+# ship-kit context cache (generated, not committed)
+.ship-context/
+.ship-context-cache/
+.ship_context_*.json
+
 .DS_Store
 .env
 .env.*

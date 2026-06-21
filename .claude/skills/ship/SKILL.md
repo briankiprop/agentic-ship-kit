@@ -170,3 +170,11 @@ continue
 ## Final response
 
 Summarize: the tier and why, what changed, current phase, completed phases, test status, review decision (for small/large), remaining risks, a suggested PR title and description, and the exact next command or prompt.
+
+## Agent execution rules
+
+- Invoke design, coder, and verify in sequence — never in parallel (each depends on the last).
+- If `.ship-context/INDEX.md` exists, read it before any Grep or Glob sweep.
+- Never re-read a file already summarised in `.ship-context/structure.md` or `symbols.md`.
+- Do not read the whole repo. Read only files named in the plan or directly relevant to the change.
+- Keep `handoff.md` under 150 lines. Omit anything derivable from `status.md` or `git diff`.

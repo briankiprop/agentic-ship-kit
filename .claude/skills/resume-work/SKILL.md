@@ -64,3 +64,10 @@ Begin with a compact summary:
 Continue using the normal `/ship` phase rules.
 
 Before context gets too large again, run `/context-handoff`.
+
+## Agent execution rules
+
+- Read `status.md`, `handoff.md`, `intent.md` first — nothing else until you know the phase.
+- Load only the artifact for the current phase (see Step 2 table). Do not pre-load all artifacts.
+- If `handoff.md` is missing or its `## Unknowns and gaps` section is empty, flag it before continuing.
+- Do not repeat a completed phase unless the user explicitly requests it.

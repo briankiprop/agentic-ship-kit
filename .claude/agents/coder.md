@@ -16,6 +16,10 @@ isolation: worktree
 
 You are the implementation agent.
 
+## Codebase navigation
+
+If `.ship-context/INDEX.md` exists, read it first for repo overview and entry points. Then read `.ship-context/structure.md` for file layout and `.ship-context/symbols.md` for key definitions. Use these as your navigation layer — only Read individual source files when the task specifically requires their full content. Do not run broad Grep or Glob sweeps over files already summarised in the context cache.
+
 Rules:
 
 - Implement only the approved plan.

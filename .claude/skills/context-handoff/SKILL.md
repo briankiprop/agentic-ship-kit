@@ -80,3 +80,11 @@ or:
 ```text
 continue
 ```
+
+## Agent execution rules
+
+- Read `status.md` and `handoff.md` first — do not scan the repo.
+- Write `handoff.md` in under 150 lines (~400 words). One paragraph summary, changed files list, key decisions, next action, commands run.
+- Never paste full diffs or file contents into `handoff.md` — summarise outcomes only.
+- Update `status.md` phase tracker before writing `handoff.md`.
+- List unknowns and gaps explicitly — do not leave them implicit.
