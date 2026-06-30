@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "ship-context": {
+      "command": "python",
+      "args": ["GLOBAL_SCRIPTS_DIR/context_server.py"],
+      "env": {}
+    }
+  }
+}

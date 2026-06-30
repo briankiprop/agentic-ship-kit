@@ -37,10 +37,7 @@ done
 
 LOG_FILE=".agent-runs/checkpoint.log"
 
-"$PY" - "$STATUS_FILE" "$HANDOFF_FILE" <<'INNER_PY' 2>>"$LOG_FILE" || {
-  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) checkpoint.sh: Python step failed — see $LOG_FILE" >> "$LOG_FILE"
-  exit 0
-}
+"$PY" - "$STATUS_FILE" "$HANDOFF_FILE" 2>>"$LOG_FILE" <<'INNER_PY'
 from __future__ import annotations
 from datetime import datetime, timezone
 from pathlib import Path
@@ -104,5 +101,8 @@ if handoff_path.is_file():
             file=_sys.stderr,
         )
 INNER_PY
+if [ $? -ne 0 ]; then
+  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) checkpoint.sh: Python step failed — see $LOG_FILE" >> "$LOG_FILE"
+fi
 
 exit 0

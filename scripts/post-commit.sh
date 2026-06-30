@@ -35,7 +35,12 @@ if [ "$CODE_CHANGED" -eq 0 ]; then
 fi
 
 echo "[ship-kit] Code files changed — refreshing .ship-context/..."
-bash "$(git rev-parse --show-toplevel)/scripts/build-context.sh" --force \
-  "$(git rev-parse --show-toplevel)" >/dev/null 2>&1 || true
+TOPLEVEL="$(git rev-parse --show-toplevel)"
+# Prefer project-local build-context.sh; fall back to global install
+BUILD_CTX="$TOPLEVEL/scripts/build-context.sh"
+if [ ! -f "$BUILD_CTX" ]; then
+  BUILD_CTX="$HOME/.claude/scripts/build-context.sh"
+fi
+bash "$BUILD_CTX" --force "$TOPLEVEL" >/dev/null 2>&1 || true
 
 exit 0

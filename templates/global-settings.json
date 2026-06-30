@@ -6,18 +6,12 @@
       "Bash(git diff *)",
       "Bash(git branch *)",
       "Bash(git checkout -b *)",
-      "Bash(python3 tests/test_template_structure.py)",
-      "Bash(./scripts/run-quality-gates.sh)",
-      "Bash(bash scripts/checkpoint.sh)",
       "Bash(npm test *)",
       "Bash(pnpm test *)",
       "Bash(yarn test *)",
       "Bash(pytest *)",
-      "PowerShell(Start-Sleep -Seconds 10; $log = \"$env:USERPROFILE\\\\.agentic-ship-runs\\\\2026-06-18-195727-add-registration-page.log\"; $f = Get-Item $log; Write-Host \"Size: $\\($f.Length\\)\"; Get-Content $log; Write-Host \"---LOCK---\"; Get-Content \"$env:USERPROFILE\\\\.agentic-ship-running.pid\" -ErrorAction SilentlyContinue; Write-Host \"---CLAUDE---\"; Get-Process claude -ErrorAction SilentlyContinue | Select-Object Id, CPU, StartTime)",
-      "PowerShell(Get-Process -Name bash,claude -ErrorAction SilentlyContinue)",
-      "Edit(/.claude/skills/context-handoff/**)",
-      "Edit(/.claude/skills/resume-work/**)",
-      "Edit(/.claude/skills/plan-change/**)"
+      "Bash(bash ~/.claude/scripts/checkpoint.sh)",
+      "Bash(bash ~/.claude/scripts/build-context.sh*)"
     ],
     "deny": [
       "Read(./.env)",
@@ -51,12 +45,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash scripts/checkpoint.sh",
+            "command": "bash ~/.claude/scripts/checkpoint.sh",
             "timeout": 5
           },
           {
             "type": "command",
-            "command": "bash scripts/notify-telegram.sh",
+            "command": "bash ~/.claude/scripts/notify-telegram.sh",
             "timeout": 10
           }
         ]

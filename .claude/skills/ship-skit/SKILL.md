@@ -25,6 +25,65 @@ If the project also has a per-project `/ship` skill installed, that one controls
 
 If you said "continue", "resume", or "go to phase 2" — do not start over. Read `.agent-runs/latest-run.txt`, then that run's `status.md` and `handoff.md`, then continue from the next unchecked phase.
 
+---
+
+## First-run bootstrap (global install only)
+
+Check whether this project has been bootstrapped:
+
+```bash
+test -d ".agent-runs" && echo "bootstrapped" || echo "fresh"
+```
+
+**If fresh**, run these steps silently before triaging — they only fire once:
+
+```bash
+# 1. Create the runs directory
+mkdir -p .agent-runs
+
+# 2. Add gitignore entries if not already present
+GITIGNORE=".gitignore"
+MARKER="# agentic-ship-kit"
+if [ ! -f "$GITIGNORE" ] || ! grep -qF "$MARKER" "$GITIGNORE"; then
+  printf '\n%s\n.agent-runs/\n.ship-context/\n.ship-context-cache/\n.ship_context_*.json\n.mcp.json\n' "$MARKER" >> "$GITIGNORE"
+fi
+
+# 3. Write .mcp.json pointing to global context server if not present
+if [ ! -f ".mcp.json" ]; then
+  PY_CMD="python"; command -v python3 >/dev/null 2>&1 && PY_CMD="python3"
+  cat > .mcp.json <<MCPEOF
+{
+  "mcpServers": {
+    "ship-context": {
+      "command": "$PY_CMD",
+      "args": ["$HOME/.claude/scripts/context_server.py"],
+      "env": {}
+    }
+  }
+}
+MCPEOF
+fi
+
+# 4. Wire post-commit hook if in a git repo
+if [ -d ".git/hooks" ]; then
+  POST_COMMIT=".git/hooks/post-commit"
+  HOOK_MARKER="# ship-kit-hook"
+  if [ ! -f "$POST_COMMIT" ] || ! grep -qF "$HOOK_MARKER" "$POST_COMMIT"; then
+    TOPLEVEL="$(git rev-parse --show-toplevel 2>/dev/null || echo .)"
+    printf '\n%s\nbash "%s/scripts/post-commit.sh" 2>/dev/null || bash "%s/.claude/scripts/post-commit.sh" 2>/dev/null || true\n' \
+      "$HOOK_MARKER" "$TOPLEVEL" "$HOME" >> "$POST_COMMIT"
+    chmod +x "$POST_COMMIT"
+  fi
+fi
+
+# 5. Prime the context cache
+bash "$HOME/.claude/scripts/build-context.sh" "$PWD" >/dev/null 2>&1 || true
+```
+
+Skip this entire block if `.agent-runs/` already exists — the project is already bootstrapped.
+
+---
+
 If context is close to the limit, save progress first:
 - Update `status.md` and `handoff.md` with current phase and next step
 - Tell the user to start a new session and say `continue`
